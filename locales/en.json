@@ -1,0 +1,79 @@
+{
+  "start": {
+    "welcome": "👀 heyy, welcome to <b>LearneAI</b> — the language coach that actually talks like a human, not a textbook.\n\n🔥 adaptive placement quiz (it will roast you)\n📚 smart Leitner-box vocab system\n💬 <b>Las o Lus</b> — a flirty AI partner you practice with\n🎙️ voice messages both ways\n\n<i>tap for the full story 👇</i>",
+    "welcome_more": "🧠 <b>how it works:</b>\n1. i figure out your real level (no lying 👀)\n2. we build your daily vocab habit — your pace, your goal\n3. you vibe with your AI partner in your target language\n4. streaks keep you honest. miss a day… we WILL talk about it 😤\n\nready? pick your native language 🌍",
+    "choose_native": "first things first — pick your <b>native</b> language 🌍",
+    "choose_native_other": "type the name of your language 📝",
+    "native_saved": "{native} it is. ui switched instantly 😎",
+    "choose_target": "clean. now — which language are we conquering? 🎯",
+    "level_q": "okay, be honest... how good are you at <b>{target}</b>? 👀",
+    "tease": "are you sure or just being modest? let's see... 🤨",
+    "quiz_intro": "vibe check: <b>{n} quick questions</b>. no googling, i'll know 🔥",
+    "question": "<b>Q{i}/{n}</b>\n\n{q}",
+    "quiz_unavailable": "quiz machine is sleeping rn 💤 so i'll trust your vibe — we'll calibrate as we go",
+    "verdict": "{verdict}\n\n📈 locking your level in at <b>{level}</b> and updating your mind-map…",
+    "goal_q": "last thing — how many new words per day? be real 😌",
+    "goal_custom": "drop a number (1–100) 👇",
+    "goal_invalid": "lol no. send a number between 1 and 100 🙃",
+    "done": "you're all set, <b>{name}</b>! let's cook 🔥"
+  },
+  "levels": {
+    "barely": "barely know anything 😅",
+    "beginner": "beginner",
+    "intermediate": "intermediate",
+    "good": "pretty good 😏",
+    "advanced": "advanced"
+  },
+  "goals": {
+    "custom": "✍️ custom"
+  },
+  "menu": {
+    "title": "your crib 🏠 — what's the move?",
+    "learn": "📚 learn",
+    "roleplay": "💬 las o lus",
+    "dashboard": "📊 dashboard",
+    "streak": "🔥 streak: {n}"
+  },
+  "learn": {
+    "menu": "📚 vocab gym — let's see those gains",
+    "due": "🔥 <b>{n}</b> cards due for review",
+    "no_due": "nothing due rn 😴 your box is clear",
+    "today": "📈 today: <b>{done}/{goal}</b> new words",
+    "boxes": "🧠 box spread: {stats}",
+    "btn_review": "🔁 review due ({n})",
+    "btn_new": "✨ learn new words",
+    "btn_add": "✍️ add word",
+    "btn_back": "🏠 menu",
+    "review_intro": "{n} cards. stay locked in 😤",
+    "front": "🤔 what does <b>{word}</b> mean?",
+    "back": "<b>{word}</b> = <b>{translation}</b>\n\ndid you get it? be honest 👀",
+    "btn_show": "👀 show translation",
+    "btn_knew": "✅ knew it",
+    "btn_nope": "❌ nope",
+    "review_done": "session done 💪 {correct}/{total} correct\nnext reviews scheduled — box math never lies 🧮",
+    "new_intro": "{n} fresh words incoming 🚀",
+    "new_card": "✨ <b>{word}</b> — {translation}",
+    "btn_got": "✅ got it (add to my box)",
+    "btn_known": "😎 knew it already (skip)",
+    "new_done": "added <b>{n}</b> words to your box 📥 daily goal: {done}/{goal}",
+    "all_done": "daily goal crushed 🏆 come back tomorrow, machine needs rest too",
+    "no_new": "word bank's dry rn — add words manually ✍️ or try again later",
+    "add_prompt": "send one word per line, like:\n<code>strawberry = توت فرنگی</code>\nor just the word and i'll translate 📝",
+    "add_done": "added <b>{n}</b> word(s) to your box 📥",
+    "add_invalid": "didn't catch that 🫠 try: <code>word = translation</code>",
+    "error": "vocab machine broke 💀 try again in a sec"
+  },
+  "rp": {
+    "intro": "💬 <b>las o lus</b> — your AI partner is texting…\njust vibe, reply naturally, send voice notes, whatever 😏\n\n<i>/end to bounce • confused? tap the button under their msgs</i>",
+    "ended": "chat archived 📁 {msgs} messages in {mins} min\nyour partner will miss you (probably)",
+    "expired": "you ghosted for {mins} min… session auto-ended 💀\nbut i'm still here — keep texting and we restart fresh",
+    "stt_fail": "couldn't hear that 💀 send it as text?",
+    "llm_fail": "your partner's phone died 💀 try again in a sec",
+    "btn_tr": "🈯 didn't understand",
+    "translation": "🈯 <b>{word}</b>:\n<i>{tr}</i>"
+  },
+  "common": {
+    "error": "oops, something broke. try again 💀",
+    "not_onboarded": "hit /start first — we gotta talk 😭"
+  }
+}

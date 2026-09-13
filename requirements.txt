@@ -1,0 +1,25 @@
+# ==== Telegram Bot Framework ====
+aiogram==3.31.0          # Async Telegram Bot framework (3.x, FSM built-in)
+
+# ==== Database ====
+SQLAlchemy[asyncio]==2.0.35   # Async ORM (works with aiosqlite now, asyncpg later)
+aiosqlite==0.20.0             # Async SQLite driver (swap to asyncpg for PostgreSQL)
+greenlet>=3.1                 # Required by SQLAlchemy async engine
+
+# ==== LLM Providers (Free Tiers) ====
+groq==0.11.0               # Groq API client (Llama-3 / Mixtral / Whisper audio)
+google-generativeai==0.8.3 # Gemini free tier (fallback LLM provider)
+httpx==0.27.2              # Async HTTP client (generic provider calls / health checks)
+
+# ==== Speech (STT / TTS) ====
+edge-tts==7.2.8            # Free Microsoft Edge TTS (natural neural voices)
+
+# ==== Translation ====
+deep-translator==1.11.4    # Free Google Translate wrapper (no API key needed)
+# LibreTranslate is used via plain httpx when configured in .env
+
+# ==== Utilities ====
+python-dotenv==1.0.1       # .env loading
+pydantic>=2.9              # Config validation (aiogram dependency; >= for wide Python support)
+pydantic-settings>=2.5     # BaseSettings for typed env config
+
