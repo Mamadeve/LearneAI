@@ -1,6 +1,6 @@
-"""Async SQLAlchemy connection & session factory optimized for PostgreSQL (asyncpg).
+"""Async SQLAlchemy connection & session factory optimized for Supabase PostgreSQL.
 
-Configured with explicit connection pooling limits to respect Render's 512MB RAM cap.
+Implements SSL requirements and connection pooling parameters suitable for HF Spaces.
 """
 from __future__ import annotations
 
@@ -30,9 +30,14 @@ def get_engine() -> AsyncEngine:
         if db_url.startswith("postgresql://") or db_url.startswith("postgres://"):
             db_url = db_url.replace("postgresql://", "postgresql+asyncpg://").replace("postgres://", "postgresql+asyncpg://")
 
-        # Configure connection for Supabase & Render
-        # We disable prepared statements cache for asyncpg because Supabase's 
-        # transaction pooler (Supavisor) does not support them well across sessions.
+        # Supabase specific SSL enforcement and asyncpg configurations
+        connect_args = {
+            "ssl": "require",
+            # CRITICAL FOR SUPABASE: Disable prepared statements for PgBouncer / Supavisor compatibility
+            "prepared_statement_cache_size": 0, 
+        }
+
+        # Configure connection pool for resilience and transient network blips
         _engine = create_async_engine(
             db_url,
             echo=False,
@@ -40,8 +45,8 @@ def get_engine() -> AsyncEngine:
             pool_size=5,
             max_overflow=10,
             pool_pre_ping=True,
-            pool_recycle=1800, # Recycle connections after 30 minutes
-            connect_args={"prepared_statement_cache_size": 0}, # CRITICAL FOR SUPABASE
+            pool_recycle=1800, # Recycle connections after 30 minutes to prevent drops
+            connect_args=connect_args,
         )
     return _engine
 
@@ -77,3 +82,10 @@ async def close_engine() -> None:
         await _engine.dispose()
         _engine = None
         _session_factory = None
+
+async def init_db() -> None:
+    """Ensure tables exist on Supabase. Called dynamically at startup."""
+    from database.models import Base
+    engine = get_engine()
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)

@@ -24,6 +24,10 @@ class Settings(BaseSettings):
     bot_token: str = ""
     admin_ids: str = ""  # comma-separated telegram IDs
 
+    # ---------- HF Spaces / Webhook ----------
+    app_url: str = ""
+    enable_anti_sleep: bool = True
+
     # ---------- Database ----------
     database_url: str = "sqlite+aiosqlite:///./learneai.db"
 
