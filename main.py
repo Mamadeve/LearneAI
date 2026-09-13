@@ -1,6 +1,6 @@
-"""LearneAI entry point — Webhook server (FastAPI) and bot wiring for HF Spaces.
+"""LearneAI entry point — Webhook server (FastAPI) and bot wiring.
 
-Runs via Uvicorn on 0.0.0.0:7860. Includes anti-sleep keep-alive task.
+Runs via Uvicorn. Reads PORT env var, defaults to 8000. Includes optional keep-alive task.
 """
 from __future__ import annotations
 
@@ -32,7 +32,7 @@ logger = logging.getLogger("learneai")
 
 settings = get_settings()
 if not settings.bot_token:
-    raise RuntimeError("BOT_TOKEN is missing — set it in HF Space Secrets.")
+    raise RuntimeError("BOT_TOKEN is missing — set it in your environment variables.")
 
 bot = Bot(
     token=settings.bot_token,
@@ -124,4 +124,5 @@ async def health_check():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=7860, reload=False)
+    port = int(os.getenv("PORT", 8000))
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False)
