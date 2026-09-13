@@ -1,0 +1,24 @@
+services:
+  # 1. Telegram Bot (Webhook Server)
+  - type: web
+    name: learneai-bot
+    env: docker
+    plan: free # Standardizing on free tier (512MB RAM limit)
+    healthCheckPath: /healthz
+    envVars:
+      - key: PORT
+        value: 8000
+      # Paste your Supabase Connection String here via the Dashboard
+      - key: DATABASE_URL
+        sync: false
+      # Define these inside the Render Dashboard
+      - key: WEBHOOK_URL
+        sync: false
+      - key: BOT_TOKEN
+        sync: false
+      - key: ADMIN_IDS
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false

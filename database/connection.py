@@ -30,8 +30,9 @@ def get_engine() -> AsyncEngine:
         if db_url.startswith("postgresql://") or db_url.startswith("postgres://"):
             db_url = db_url.replace("postgresql://", "postgresql+asyncpg://").replace("postgres://", "postgresql+asyncpg://")
 
-        # Configure connection pool for tight memory limits (Render Free: 512MB)
-        # Using QueuePool instead of NullPool to reuse connections and reduce overhead
+        # Configure connection for Supabase & Render
+        # We disable prepared statements cache for asyncpg because Supabase's 
+        # transaction pooler (Supavisor) does not support them well across sessions.
         _engine = create_async_engine(
             db_url,
             echo=False,
@@ -40,6 +41,7 @@ def get_engine() -> AsyncEngine:
             max_overflow=10,
             pool_pre_ping=True,
             pool_recycle=1800, # Recycle connections after 30 minutes
+            connect_args={"prepared_statement_cache_size": 0}, # CRITICAL FOR SUPABASE
         )
     return _engine
 
