@@ -1,22 +1,20 @@
-"""LearneAI entry point — Webhook server (FastAPI) and bot wiring.
+"""LearneAI entry point — Dummy Webhook server (FastAPI) for Koyeb Health Checks + Long Polling Bot.
 
-Runs via Uvicorn. Reads PORT env var, defaults to 8000. Includes optional keep-alive task.
+Runs via Uvicorn. Reads PORT env var, defaults to 8000.
 """
 from __future__ import annotations
 
 import asyncio
 import logging
 import os
-import random
 import sys
 from contextlib import asynccontextmanager
 
-import httpx
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
-from aiogram.types import BotCommand, Update
+from aiogram.types import BotCommand
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -46,32 +44,16 @@ dp.include_router(roleplay.router)
 dp.include_router(settings_handler.router)
 
 
-# Anti-Sleep Keep-Alive Task
-async def anti_sleep_task(app_url: str):
-    """Pings the /healthz endpoint at randomized intervals (10-14m) to prevent HF pause."""
-    health_url = f"{app_url.rstrip('/')}/healthz"
-    logger.info("Anti-sleep task started, targeting: %s", health_url)
-    async with httpx.AsyncClient(timeout=30) as client:
-        while True:
-            # Sleep between 10 to 14 minutes
-            sleep_time = random.uniform(10 * 60, 14 * 60)
-            await asyncio.sleep(sleep_time)
-            try:
-                resp = await client.get(health_url)
-                logger.info("Anti-sleep ping successful: HTTP %s", resp.status_code)
-            except Exception as e:
-                logger.warning("Anti-sleep ping failed: %s", e)
-
-
-_anti_sleep_task_ref = None
+_polling_task = None
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup
+    # 1. Startup Database
     logger.info("Initializing database schemas (Supabase)...")
     await init_db()
     logger.info("Database schemas initialized.")
 
+    # 2. Setup Bot Commands
     await bot.set_my_commands([
         BotCommand(command="start", description="start / restart setup 🚀"),
         BotCommand(command="menu", description="main menu 🏠"),
@@ -83,46 +65,42 @@ async def lifespan(app: FastAPI):
     me = await bot.get_me()
     logger.info("Bot live as @%s (id=%s)", me.username, me.id)
     
-    app_url = settings.app_url or os.getenv("APP_URL")
-    if app_url:
-        webhook_target = f"{app_url.rstrip('/')}/webhook"
-        await bot.set_webhook(webhook_target)
-        logger.info("Webhook set to %s", webhook_target)
-        
-        # Start anti-sleep if enabled
-        if settings.enable_anti_sleep:
-            global _anti_sleep_task_ref
-            _anti_sleep_task_ref = asyncio.create_task(anti_sleep_task(app_url))
-    else:
-        logger.warning("APP_URL not set! Webhook will not be configured.")
+    # 3. Drop any existing webhook to prevent conflicts with long polling
+    await bot.delete_webhook(drop_pending_updates=True)
+    logger.info("Webhook deleted. Starting long polling...")
+
+    # 4. Start long polling as a background task
+    global _polling_task
+    _polling_task = asyncio.create_task(dp.start_polling(bot))
     
     yield
     
-    # Shutdown
-    if _anti_sleep_task_ref:
-        _anti_sleep_task_ref.cancel()
-    await bot.delete_webhook()
+    # 5. Shutdown
+    if _polling_task:
+        _polling_task.cancel()
+        try:
+            await _polling_task
+        except asyncio.CancelledError:
+            pass
     await close_engine()
     logger.info("Engine disposed — bye 👋")
 
 
+# FastAPI acts as a dummy web server for Koyeb health checks
 app = FastAPI(lifespan=lifespan)
 
-@app.post("/webhook")
-async def telegram_webhook(request: Request):
-    """Handle incoming Telegram updates."""
-    data = await request.json()
-    update = Update(**data)
-    await dp.feed_update(bot, update)
-    return {"status": "ok"}
 
 @app.get("/")
+@app.get("/health")
 @app.get("/healthz")
 async def health_check():
-    """Hugging Face / UptimeRobot health check endpoint."""
-    return {"status": "healthy"}
+    """Koyeb / UptimeRobot health check endpoint."""
+    return {"status": "healthy", "server": "koyeb"}
+
 
 if __name__ == "__main__":
     import uvicorn
+    # Koyeb requires listening on a specific port for health checks
     port = int(os.getenv("PORT", 8000))
+    logger.info(f"Starting dummy web server on port {port} for health checks...")
     uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False)
