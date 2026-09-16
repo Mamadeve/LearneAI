@@ -41,13 +41,18 @@ async def get_live_config(user_id: int | None = None) -> dict[str, str]:
                 
             if user.api_overrides:
                 cfg.update({k: str(v) for k, v in user.api_overrides.items() if k in CORE_KEYS})
+                
+    # Normalize deprecated Groq models
+    if cfg.get("llm_model") in ["llama3-8b-8192", "llama3-70b-8192", "mixtral-8x7b-32768"]:
+        cfg["llm_model"] = "llama-3.3-70b-versatile"
+        
     return cfg
 
 class LLMFactory:
     @staticmethod
     def create_provider(provider_name: str, cfg: dict) -> BaseLLMProvider:
         if provider_name == "groq":
-            return GroqProvider(api_key=cfg.get("groq_api_key", ""), model=cfg.get("llm_model", "llama-3.1-8b-instant"))
+            return GroqProvider(api_key=cfg.get("groq_api_key", ""), model=cfg.get("llm_model", "llama-3.3-70b-versatile"))
         elif provider_name == "gemini":
             return GeminiProvider(api_key=cfg.get("gemini_api_key", ""), model=cfg.get("llm_model", "gemini-1.5-flash"))
         elif provider_name == "openrouter":

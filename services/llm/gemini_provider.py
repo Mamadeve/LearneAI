@@ -32,11 +32,12 @@ class GeminiProvider(BaseLLMProvider):
         if system:
             body["systemInstruction"] = {"parts": [{"text": system}]}
             
-        url = f"{GEMINI_BASE}/{self.model}:generateContent?key={self.api_key}"
+        url = f"{GEMINI_BASE}/{self.model}:generateContent"
+        headers = {"x-goog-api-key": self.api_key, "Content-Type": "application/json"}
         
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.post(url, json=body, timeout=60) as response:
+                async with session.post(url, json=body, headers=headers, timeout=60) as response:
                     response.raise_for_status()
                     data = await response.json()
                     
@@ -49,9 +50,12 @@ class GeminiProvider(BaseLLMProvider):
         except asyncio.TimeoutError:
             logger.error("Gemini API request timed out.")
             raise Exception("Gemini API Timeout")
+        except aiohttp.ClientResponseError as e:
+            logger.error(f"Gemini API HTTP Error {e.status}: (API Key masked)")
+            raise Exception(f"Gemini API Error {e.status}")
         except aiohttp.ClientError as e:
-            logger.error(f"Gemini API Client Error: {e}")
-            raise Exception(f"Gemini API Error: {e}")
+            logger.error(f"Gemini API Client Error: (API Key masked)")
+            raise Exception(f"Gemini API Error")
         except Exception as e:
-            logger.error(f"Unexpected error communicating with Gemini API: {e}")
-            raise
+            logger.error(f"Unexpected error communicating with Gemini API: (API Key masked)")
+            raise Exception("Unexpected Gemini Error")

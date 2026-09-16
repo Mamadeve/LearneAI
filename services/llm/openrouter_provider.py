@@ -39,9 +39,12 @@ class OpenRouterProvider(BaseLLMProvider):
         except asyncio.TimeoutError:
             logger.error("OpenRouter API request timed out.")
             raise Exception("OpenRouter API Timeout")
+        except aiohttp.ClientResponseError as e:
+            logger.error(f"OpenRouter API HTTP Error {e.status}: (API Key masked)")
+            raise Exception(f"OpenRouter API Error {e.status}")
         except aiohttp.ClientError as e:
-            logger.error(f"OpenRouter API Client Error: {e}")
-            raise Exception(f"OpenRouter API Error: {e}")
+            logger.error(f"OpenRouter API Client Error: (API Key masked)")
+            raise Exception(f"OpenRouter API Error")
         except Exception as e:
-            logger.error(f"Unexpected error communicating with OpenRouter API: {e}")
-            raise
+            logger.error(f"Unexpected error communicating with OpenRouter API: (API Key masked)")
+            raise Exception("Unexpected OpenRouter Error")

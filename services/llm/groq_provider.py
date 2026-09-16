@@ -40,9 +40,12 @@ class GroqProvider(BaseLLMProvider):
         except asyncio.TimeoutError:
             logger.error("Groq API request timed out.")
             raise Exception("Groq API Timeout")
+        except aiohttp.ClientResponseError as e:
+            logger.error(f"Groq API HTTP Error {e.status}: (API Key masked)")
+            raise Exception(f"Groq API Error {e.status}")
         except aiohttp.ClientError as e:
-            logger.error(f"Groq API Client Error: {e}")
-            raise Exception(f"Groq API Error: {e}")
+            logger.error(f"Groq API Client Error: (API Key masked)")
+            raise Exception(f"Groq API Error")
         except Exception as e:
-            logger.error(f"Unexpected error communicating with Groq API: {e}")
-            raise
+            logger.error(f"Unexpected error communicating with Groq API: (API Key masked)")
+            raise Exception("Unexpected Groq Error")
