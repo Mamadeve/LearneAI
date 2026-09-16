@@ -88,13 +88,13 @@ async def main() -> None:
 
     # [5] roleplay pipeline with monkeypatched LLM: [VOICE] -> real TTS file + history
     import handlers.roleplay as rp
-    orig_chat = rp.llm_manager.chat
+    orig_chat = rp.llm.chat
 
     async def fake_chat(messages, user_id=None, **kw):
         assert any(m["role"] == "system" and "NOT an assistant" in m["content"] for m in messages)
         return "[VOICE] heyy bestie, watcha up to? 🔥"
 
-    rp.llm_manager.chat = fake_chat
+    rp.llm.chat = fake_chat
     await crud.set_genders(88001, "male")
     user = await crud.get_user(88001)
     ok("partner gender set", user.bot_partner_gender == "female")
@@ -117,7 +117,7 @@ async def main() -> None:
     ok("text + translate btn after voice", any("heyy bestie" in t for t in msg.texts))
     from handlers.roleplay import translate_kb
     ok("translate button cb", translate_kb("fa").inline_keyboard[0][0].callback_data == "rp:tr")
-    rp.llm_manager.chat = orig_chat
+    rp.llm.chat = orig_chat
 
     # [6] history memory ordering + mindmap session stats
     await crud.add_chat_message(88001, "user", "hi")

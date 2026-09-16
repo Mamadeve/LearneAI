@@ -16,7 +16,7 @@ from aiogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMar
 
 import utils.i18n as i18n
 from database import crud
-from services import llm_manager, translation
+from services import llm, translation
 from services.prompts import lang_name, level_cefr
 
 logger = logging.getLogger(__name__)
@@ -199,7 +199,7 @@ async def generate_words(user, n: int, known_texts: list[str]) -> list[tuple[str
         exclude=", ".join(known_texts[:60]) or "(none)",
         native=lang_name(user.native_language),
     )
-    raw = await llm_manager.chat([{"role": "user", "content": prompt}],
+    raw = await llm.chat([{"role": "user", "content": prompt}],
                                  temperature=0.8, max_tokens=900)
     return parse_llm_words(raw)
 

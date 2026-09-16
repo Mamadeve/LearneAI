@@ -15,8 +15,8 @@ from types import SimpleNamespace  # noqa: E402
 
 import database.crud as crud  # noqa: E402
 from database.engine import get_engine, init_db  # noqa: E402
-from services import llm_manager, stt, translation  # noqa: E402
-from services.llm_manager import LLMError  # noqa: E402
+from services import llm, stt, translation  # noqa: E402
+from services.llm import LLMError  # noqa: E402
 from services.prompts import (  # noqa: E402
     build_quiz_generation_prompt,
     build_quiz_verdict_prompt,
@@ -61,11 +61,11 @@ async def main() -> None:
 
     # [4] Live config resolution: .env defaults -> DB -> user overrides
     await crud.set_api_config("llm_provider", "gemini")
-    cfg = await llm_manager.get_live_config()
+    cfg = await llm.get_live_config()
     assert cfg["llm_provider"] == "gemini", cfg  # DB overrides .env
     await crud.get_or_create_user(42, native_language="fa")
     await crud.update_user(42, api_overrides={"llm_provider": "groq"})
-    cfg42 = await llm_manager.get_live_config(42)
+    cfg42 = await llm.get_live_config(42)
     assert cfg42["llm_provider"] == "groq"  # user override wins
     print("[4] config chain (.env -> api_configs -> user overrides) OK")
 
@@ -73,7 +73,7 @@ async def main() -> None:
     await crud.set_api_config("groq_api_key", "gsk_INVALID")
     await crud.set_api_config("gemini_api_key", "INVALID")
     try:
-        await llm_manager.chat([{"role": "user", "content": "hi"}], user_id=42)
+        await llm.chat([{"role": "user", "content": "hi"}], user_id=42)
         raise AssertionError("expected LLMError with dummy keys")
     except LLMError as e:
         assert "All LLM providers failed" in str(e)

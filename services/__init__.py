@@ -1,1 +1,1 @@
-# services package — llm_manager, tts, stt, translation, scheduler
+# services package - llm, tts, stt, translation, scheduler

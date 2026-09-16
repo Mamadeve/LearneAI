@@ -26,7 +26,7 @@ from keyboards.inline import (
     target_languages_kb,
 )
 from keyboards.menus import main_menu_kb, main_menu_text
-from services import llm_manager
+from services import llm
 from services.prompts import (
     LEVEL_TO_CEFR,
     SUPPORTED_LEVELS,
@@ -207,7 +207,7 @@ async def _launch_quiz(message: Message, state: FSMContext, user, lang: str, cla
     """Dynamic FSM placement quiz; degrades gracefully if the LLM is down."""
     target = user.target_language or "en"
     try:
-        questions = await llm_manager.generate_quiz(lang_name(target), claimed, n_questions=5)
+        questions = await llm.generate_quiz(lang_name(target), claimed, n_questions=5)
         # sanity-check LLM output shape
         for q in questions:
             assert isinstance(q.get("options"), list) and len(q["options"]) >= 2
@@ -289,7 +289,7 @@ async def _finish_quiz(
     }})
     # LLM-crafted roast/praise with canned fallback
     try:
-        verdict = await llm_manager.chat(
+        verdict = await llm.chat(
             [{"role": "user", "content": build_quiz_verdict_prompt(lang_name(user.target_language), claimed, score, weak)}],
             temperature=1.0, max_tokens=80,
         )
