@@ -34,7 +34,8 @@ def get_engine() -> AsyncEngine:
         connect_args = {
             "ssl": "require",
             # CRITICAL FOR SUPABASE: Disable prepared statements for PgBouncer / Supavisor compatibility
-            "prepared_statement_cache_size": 0, 
+            "prepared_statement_cache_size": 0,
+            "statement_cache_size": 0,
         }
 
         # Configure connection pool for resilience and transient network blips

@@ -63,8 +63,8 @@ async def get_live_config(user_id: int | None = None) -> dict[str, str]:
         if user:
             if user.selected_model_id:
                 provider_map = {
-                    "gemini": ("gemini", "gemini-1.5-flash"),
-                    "groq": ("groq", "llama-3.3-70b-versatile"),
+                    "gemini": ("gemini", "gemini-1.5-flash-latest"),
+                    "groq": ("groq", "llama-3.1-8b-instant"),
                     "openrouter": ("openrouter", "openai/gpt-4o"),
                 }
                 if user.selected_model_id in provider_map:
@@ -75,8 +75,8 @@ async def get_live_config(user_id: int | None = None) -> dict[str, str]:
 
     # Auto-fix deprecated Groq model names
     if cfg.get("llm_model") in _DEPRECATED_GROQ_MODELS:
-        logger.warning("Deprecated Groq model '%s' replaced with 'llama-3.3-70b-versatile'", cfg["llm_model"])
-        cfg["llm_model"] = "llama-3.3-70b-versatile"
+        logger.warning("Deprecated Groq model '%s' replaced with 'llama-3.1-8b-instant'", cfg["llm_model"])
+        cfg["llm_model"] = "llama-3.1-8b-instant"
 
     return cfg
 
@@ -91,12 +91,12 @@ class LLMFactory:
         if provider_name == "groq":
             return GroqProvider(
                 api_key=cfg.get("groq_api_key", ""),
-                model=cfg.get("llm_model", "llama-3.3-70b-versatile"),
+                model=cfg.get("llm_model", "llama-3.1-8b-instant"),
             )
         elif provider_name == "gemini":
             return GeminiProvider(
                 api_key=cfg.get("gemini_api_key", ""),
-                model=cfg.get("llm_model", "gemini-1.5-flash"),
+                model=cfg.get("llm_model", "gemini-1.5-flash-latest"),
             )
         elif provider_name == "openrouter":
             return OpenRouterProvider(
@@ -107,7 +107,7 @@ class LLMFactory:
             # Unknown provider → fall back to Gemini (free tier)
             return GeminiProvider(
                 api_key=cfg.get("gemini_api_key", ""),
-                model="gemini-1.5-flash",
+                model="gemini-1.5-flash-latest",
             )
 
 
