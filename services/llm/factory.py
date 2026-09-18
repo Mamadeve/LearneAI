@@ -14,7 +14,6 @@ import re
 
 from database import crud
 from services.llm.base import BaseLLMProvider
-from services.llm.gemini_provider import GeminiProvider
 from services.llm.groq_provider import GroqProvider
 from services.llm.openrouter_provider import OpenRouterProvider
 from utils.config import get_settings
@@ -23,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 CORE_KEYS = (
     "llm_provider", "llm_model",
-    "groq_api_key", "gemini_api_key", "openrouter_api_key",
+    "groq_api_key", "openrouter_api_key",
     "stt_provider", "hf_api_token",
 )
 
@@ -44,7 +43,6 @@ async def get_live_config(user_id: int | None = None) -> dict[str, str]:
         "llm_provider": s.llm_provider,
         "llm_model": s.llm_model,
         "groq_api_key": s.groq_api_key,
-        "gemini_api_key": s.gemini_api_key,
         "openrouter_api_key": getattr(s, "openrouter_api_key", ""),
         "stt_provider": s.stt_provider,
         "hf_api_token": s.hf_api_token,
@@ -56,8 +54,7 @@ async def get_live_config(user_id: int | None = None) -> dict[str, str]:
         if user:
             if user.selected_model_id:
                 provider_map = {
-                    "gemini": ("gemini", "gemini-1.5-flash"),
-                    "groq": ("groq", "llama3-8b-8192"),
+                    "groq": ("groq", "gemma2-9b-it"),
                     "openrouter": ("openrouter", "openai/gpt-4o"),
                 }
                 if user.selected_model_id in provider_map:
@@ -76,26 +73,16 @@ async def get_live_config(user_id: int | None = None) -> dict[str, str]:
 class LLMFactory:
     @staticmethod
     def create_provider(provider_name: str, cfg: dict) -> BaseLLMProvider:
-        if provider_name == "groq":
-            return GroqProvider(
-                api_key=cfg.get("groq_api_key", ""),
-                model=cfg.get("llm_model", "llama3-8b-8192"),
-            )
-        elif provider_name == "gemini":
-            return GeminiProvider(
-                api_key=cfg.get("gemini_api_key", ""),
-                model=cfg.get("llm_model", "gemini-1.5-flash"),
-            )
-        elif provider_name == "openrouter":
+        if provider_name == "openrouter":
             return OpenRouterProvider(
-                api_key=cfg.get("openrouter_api_key", ""),
+                api_key=cfg.get("openrouter_api_key", "").strip(),
                 model=cfg.get("llm_model", "openai/gpt-4o"),
             )
         else:
-            # Unknown provider → fall back to Gemini (free tier)
-            return GeminiProvider(
-                api_key=cfg.get("gemini_api_key", ""),
-                model="gemini-1.5-flash",
+            # Always default to Groq if unknown provider or "groq" is requested
+            return GroqProvider(
+                api_key=cfg.get("groq_api_key", "").strip(),
+                model=cfg.get("llm_model", "gemma2-9b-it"),
             )
 
 
@@ -114,8 +101,8 @@ async def ask_llm(
     """Unified entry point for ALL LLM calls in the application.
 
     - Prepends system_prompt as a system message if provided.
-    - Tries the user's primary provider first, then falls back through the chain.
-    - Returns a friendly error string (never crashes the handler) if ALL providers fail.
+    - Tries the user's primary provider first.
+    - Returns a friendly error string (never crashes the handler) if provider fails.
     """
     if system_prompt:
         messages = [{"role": "system", "content": system_prompt}] + messages
@@ -123,9 +110,9 @@ async def ask_llm(
     cfg = await get_live_config(user_id)
     primary = cfg.get("llm_provider", "groq")
 
-    # Build deduplicated fallback order: primary → groq → gemini
+    # Build deduplicated fallback order: primary → groq
     order: list[str] = []
-    for name in [primary, "groq", "gemini"]:
+    for name in [primary, "groq"]:
         if name not in order:
             order.append(name)
 
@@ -138,7 +125,7 @@ async def ask_llm(
                 return result
         except Exception as exc:
             last_err = exc
-            logger.warning("[LLM Fallback] %s failed: %s — trying next provider", provider_name, exc)
+            logger.warning("[LLM Fallback] %s failed: %s", provider_name, exc)
 
     # All providers failed — return a user-friendly message instead of crashing
     logger.error("ALL LLM providers failed. Last error: %s", last_err)

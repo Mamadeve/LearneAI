@@ -2,7 +2,7 @@
 
 Endpoint : POST https://api.groq.com/openai/v1/chat/completions
 Auth     : Bearer token via Authorization header
-Default  : llama3-8b-8192
+Default  : gemma2-9b-it
 """
 from __future__ import annotations
 
@@ -16,8 +16,8 @@ logger = logging.getLogger(__name__)
 class GroqProvider(BaseLLMProvider):
     API_URL = "https://api.groq.com/openai/v1/chat/completions"
 
-    def __init__(self, api_key: str, model: str = "llama3-8b-8192"):
-        self.api_key = api_key
+    def __init__(self, api_key: str, model: str = "gemma2-9b-it"):
+        self.api_key = api_key.strip()
         self.model = model
 
     async def generate_chat_response(
@@ -45,7 +45,7 @@ class GroqProvider(BaseLLMProvider):
                 logger.error(
                     "[Groq] HTTP %s: %s (key=***%s)",
                     resp.status_code,
-                    resp.text[:500],
+                    resp.text,
                     self.api_key[-4:] if len(self.api_key) >= 4 else "????",
                 )
                 raise Exception(f"Groq API returned HTTP {resp.status_code}")

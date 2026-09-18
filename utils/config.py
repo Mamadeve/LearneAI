@@ -33,7 +33,7 @@ class Settings(BaseSettings):
 
     # ---------- LLM ----------
     llm_provider: str = "groq"  # "groq" | "gemini"
-    llm_model: str = "llama-3.1-8b-instant"
+    llm_model: str = "gemma2-9b-it"
     groq_api_key: str = ""
     gemini_api_key: str = ""
 
