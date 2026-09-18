@@ -27,13 +27,6 @@ CORE_KEYS = (
     "stt_provider", "hf_api_token",
 )
 
-# Deprecated Groq model names that will 404
-_DEPRECATED_GROQ_MODELS = {
-    "llama3-8b-8192",
-    "llama3-70b-8192",
-    "mixtral-8x7b-32768",
-    "llama-3.1-8b-instant",
-}
 
 
 class LLMError(Exception):
@@ -63,8 +56,8 @@ async def get_live_config(user_id: int | None = None) -> dict[str, str]:
         if user:
             if user.selected_model_id:
                 provider_map = {
-                    "gemini": ("gemini", "gemini-1.5-flash-latest"),
-                    "groq": ("groq", "llama-3.1-8b-instant"),
+                    "gemini": ("gemini", "gemini-1.5-flash"),
+                    "groq": ("groq", "llama3-8b-8192"),
                     "openrouter": ("openrouter", "openai/gpt-4o"),
                 }
                 if user.selected_model_id in provider_map:
@@ -72,11 +65,6 @@ async def get_live_config(user_id: int | None = None) -> dict[str, str]:
 
             if user.api_overrides:
                 cfg.update({k: str(v) for k, v in user.api_overrides.items() if k in CORE_KEYS})
-
-    # Auto-fix deprecated Groq model names
-    if cfg.get("llm_model") in _DEPRECATED_GROQ_MODELS:
-        logger.warning("Deprecated Groq model '%s' replaced with 'llama-3.1-8b-instant'", cfg["llm_model"])
-        cfg["llm_model"] = "llama-3.1-8b-instant"
 
     return cfg
 
@@ -91,12 +79,12 @@ class LLMFactory:
         if provider_name == "groq":
             return GroqProvider(
                 api_key=cfg.get("groq_api_key", ""),
-                model=cfg.get("llm_model", "llama-3.1-8b-instant"),
+                model=cfg.get("llm_model", "llama3-8b-8192"),
             )
         elif provider_name == "gemini":
             return GeminiProvider(
                 api_key=cfg.get("gemini_api_key", ""),
-                model=cfg.get("llm_model", "gemini-1.5-flash-latest"),
+                model=cfg.get("llm_model", "gemini-1.5-flash"),
             )
         elif provider_name == "openrouter":
             return OpenRouterProvider(
@@ -107,7 +95,7 @@ class LLMFactory:
             # Unknown provider → fall back to Gemini (free tier)
             return GeminiProvider(
                 api_key=cfg.get("gemini_api_key", ""),
-                model="gemini-1.5-flash-latest",
+                model="gemini-1.5-flash",
             )
 
 

@@ -2,7 +2,7 @@
 
 Endpoint : POST https://api.groq.com/openai/v1/chat/completions
 Auth     : Bearer token via Authorization header
-Default  : llama-3.1-8b-instant
+Default  : llama3-8b-8192
 """
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 class GroqProvider(BaseLLMProvider):
     API_URL = "https://api.groq.com/openai/v1/chat/completions"
 
-    def __init__(self, api_key: str, model: str = "llama-3.1-8b-instant"):
+    def __init__(self, api_key: str, model: str = "llama3-8b-8192"):
         self.api_key = api_key
         self.model = model
 

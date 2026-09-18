@@ -2,7 +2,7 @@
 
 Endpoint : POST https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent
 Auth     : x-goog-api-key header (keeps URLs clean, prevents key leaking in logs)
-Default  : gemini-1.5-flash-latest
+Default  : gemini-1.5-flash
 """
 from __future__ import annotations
 
@@ -18,9 +18,9 @@ GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta/models"
 
 
 class GeminiProvider(BaseLLMProvider):
-    def __init__(self, api_key: str, model: str = "gemini-1.5-flash-latest"):
+    def __init__(self, api_key: str, model: str = "gemini-1.5-flash"):
         self.api_key = api_key
-        self.model = model if model.startswith("gemini") else "gemini-1.5-flash-latest"
+        self.model = model if model.startswith("gemini") else "gemini-1.5-flash"
 
     async def generate_chat_response(
         self,
