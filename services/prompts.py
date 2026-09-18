@@ -141,8 +141,21 @@ No preamble. Just the reaction line."""
 
 
 # ------------------------------------------------------------------ #
-#  Misc helpers                                                      #
+#  Misc helpers & Constants                                          #
 # ------------------------------------------------------------------ #
+
+GEN_WORDS_PROMPT = """You are an expert language teacher.
+Generate exactly {n} practical, highly useful vocabulary words or short everyday phrases in {lang} suitable for a {cefr} level student.
+The student's native language is {native}. Provide the translations in {native}.
+DO NOT include any of these words (they already know them): {exclude}
+
+Return ONLY a JSON array of objects with "w" (the {lang} word/phrase) and "t" (the {native} translation).
+Example:
+[
+  {{"w": "example_word", "t": "example_translation"}}
+]
+No markdown fences, no explanations. Just the JSON array.
+"""
 
 
 def build_translation_prompt(text: str, source_lang: str, target_lang: str) -> str:

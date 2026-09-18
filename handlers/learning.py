@@ -17,7 +17,7 @@ from aiogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMar
 import utils.i18n as i18n
 from database import crud
 from services import llm, translation
-from services.prompts import lang_name, level_cefr
+from services.prompts import GEN_WORDS_PROMPT, lang_name, level_cefr
 
 logger = logging.getLogger(__name__)
 router = Router(name="learning")
