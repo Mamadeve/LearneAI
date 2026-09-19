@@ -54,7 +54,7 @@ async def get_live_config(user_id: int | None = None) -> dict[str, str]:
         if user:
             if user.selected_model_id:
                 provider_map = {
-                    "groq": ("groq", "gemma2-9b-it"),
+                    "groq": ("groq", "openai/gpt-oss-20b"),
                     "openrouter": ("openrouter", "openai/gpt-4o"),
                 }
                 if user.selected_model_id in provider_map:
@@ -82,7 +82,7 @@ class LLMFactory:
             # Always default to Groq if unknown provider or "groq" is requested
             return GroqProvider(
                 api_key=cfg.get("groq_api_key", "").strip(),
-                model=cfg.get("llm_model", "gemma2-9b-it"),
+                model=cfg.get("llm_model", "openai/gpt-oss-20b"),
             )
 
 

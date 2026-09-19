@@ -33,7 +33,7 @@ class Settings(BaseSettings):
 
     # ---------- LLM ----------
     llm_provider: str = "groq"  # "groq" | "gemini"
-    llm_model: str = "gemma2-9b-it"
+    llm_model: str = "openai/gpt-oss-20b"
     groq_api_key: str = ""
     gemini_api_key: str = ""
 
