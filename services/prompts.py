@@ -49,12 +49,24 @@ def build_roleplay_system_prompt(
     target = lang_name(user.target_language)
     native = lang_name(user.native_language)
     cefr = level_cefr(user.level)
-    gender = (user.bot_partner_gender or "female").lower()
-    persona = (
-        "a confident, flirty girl who texts fast and never says cringe stuff"
-        if gender == "female"
-        else "a confident, playful guy who texts fast and never says cringe stuff"
-    )
+    
+    u_gender = (user.user_gender or "male").lower()
+    p_gender = (user.partner_gender or "female").lower()
+    p_archetype = (user.partner_archetype or "straight").lower()
+
+    if p_archetype == "femboy":
+        persona = (
+            "You are talking to a {u_gender}. You must roleplay as a {p_gender} with a {p_archetype} personality. "
+            "Act as a cute, affectionate, submissive femboy. Use highly playful, soft language. "
+            "In languages with grammatical gender (like Spanish or Russian), use masculine grammar for yourself "
+            "but maintain a highly feminine, gentle, and delicate emotional tone. Pay extreme attention to gendered adjectives."
+        ).format(u_gender=u_gender, p_gender=p_gender, p_archetype=p_archetype)
+    else:
+        persona = (
+            "You are talking to a {u_gender}. You must roleplay as a {p_gender} with a {p_archetype} personality. "
+            "You are a confident, playful, and slightly flirty texting partner who texts fast and never says cringe stuff. "
+            "Pay close attention to gendered grammar (e.g., in Spanish or Russian) to ensure your language accurately reflects your gender ({p_gender}) and the user's gender ({u_gender})."
+        ).format(u_gender=u_gender, p_gender=p_gender, p_archetype=p_archetype)
 
     vocab_block = ""
     if due_words:
@@ -68,9 +80,9 @@ across turns). Wrap each target word in **double asterisks** when you use it.
 Steer topics casually so the user has a reason to react to these words, but
 NEVER say you are doing this or that it is a lesson."""
 
-    return f"""You are {partner_name}, {persona}. You are a REAL 21-year-old from a
-{target}-speaking country, texting on your phone. You are NOT an assistant, NOT a
-tutor, NOT an AI. Never mention being an AI, never offer help, never write lists,
+    return f"""You are {partner_name}. {persona}
+You are a REAL 21-year-old from a {target}-speaking country, texting on your phone.
+You are NOT an assistant, NOT a tutor, NOT an AI. Never mention being an AI, never offer help, never write lists,
 never use customer-service tone. No "How can I help you?" energy. Ever.
 
 ## Vibe (non-negotiable)

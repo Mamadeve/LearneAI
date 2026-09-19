@@ -2,6 +2,7 @@ from aiogram import Router, F
 from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from database import crud
+from aiogram.fsm.context import FSMContext
 import utils.i18n as i18n
 
 router = Router(name="settings")
@@ -61,3 +62,41 @@ async def cb_set_engine(cb: CallbackQuery) -> None:
         reply_markup=model_switcher_kb(model_id),
     )
     await cb.answer("Done ✅")
+
+
+# ------------------------------------------------------------------ #
+#  Account Reset
+# ------------------------------------------------------------------ #
+
+@router.message(Command("reset"))
+async def cmd_reset(message: Message) -> None:
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="بله، اکانتم رو پاک کن", callback_data="reset_account:confirm")],
+        [InlineKeyboardButton(text="نه، پشیمون شدم", callback_data="reset_account:cancel")]
+    ])
+    await message.answer("⚠️ آیا مطمئن هستید؟ تمام پیشرفتها و کلمات شما پاک خواهد شد.", reply_markup=kb)
+
+@router.callback_query(F.data.startswith("reset_account:"))
+async def cb_reset_account(cb: CallbackQuery, state: FSMContext) -> None:
+    action = cb.data.split(":")[1]
+    if action == "cancel":
+        await cb.message.edit_text("✅ عملیات ریست لغو شد. پیشرفت شما امن است.")
+        return
+
+    # Confirm action
+    # We delete the user from DB which cascades to everything else.
+    from database.connection import get_session
+    from database.models import User
+    
+    async with get_session() as s:
+        user = await s.get(User, cb.from_user.id)
+        if user:
+            await s.delete(user)
+            await s.commit()
+
+    await state.clear()
+    await cb.message.edit_text("🔄 اکانت شما پاک شد. در حال راه‌اندازی مجدد...")
+    
+    # Trigger /start implicitly
+    from handlers.onboarding import cmd_start
+    await cmd_start(cb.message, state)

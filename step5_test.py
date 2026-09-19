@@ -97,7 +97,7 @@ async def main() -> None:
     rp.llm.chat = fake_chat
     await crud.set_genders(88001, "male")
     user = await crud.get_user(88001)
-    ok("partner gender set", user.bot_partner_gender == "female")
+    ok("partner user_gender set", user.partner_gender == "female")
 
     voice, reply = await rp.get_ai_reply(user, "hi!")
     ok("voice reply parsed", voice is True and reply == "heyy bestie, watcha up to? 🔥")

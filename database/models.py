@@ -37,8 +37,9 @@ class User(Base):
     ui_language: Mapped[str] = mapped_column(String(8), default="en")       # bot UI language (switched at onboarding)
     level: Mapped[str | None] = mapped_column(String(16))                   # e.g. "A1".."C2" / "beginner".. after quiz
     daily_goal: Mapped[int] = mapped_column(Integer, default=20)            # words per day (max 100)
-    gender: Mapped[str | None] = mapped_column(String(16))                  # "male" | "female" | "other"
-    bot_partner_gender: Mapped[str | None] = mapped_column(String(16))      # opposite of `gender` (Las o Lus)
+    user_gender: Mapped[str | None] = mapped_column(String(16))                  # "male" | "female" | "other"
+    partner_gender: Mapped[str | None] = mapped_column(String(16))      # opposite of `user_gender` (Las o Lus)
+    partner_archetype: Mapped[str | None] = mapped_column(String(32))   # e.g., "femboy", "straight", "gay"
     
     # Active LLM provider/model (user-level model switcher)
     selected_model_id: Mapped[str | None] = mapped_column(String(64), default=None)

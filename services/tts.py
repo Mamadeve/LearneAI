@@ -1,6 +1,6 @@
 """TTS via edge-tts (free, keyless Microsoft neural voices).
 
-Voice is picked from the TARGET language + the bot partner's gender so the
+Voice is picked from the TARGET language + the bot partner's user_gender so the
 "Las o Lus" partner sounds consistent. Voice name can be forced via .env
 (TTS_DEFAULT_VOICE) or the admin panel (api_configs key "tts_default_voice").
 """

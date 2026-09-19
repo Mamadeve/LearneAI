@@ -87,6 +87,21 @@ async def close_engine() -> None:
 async def init_db() -> None:
     """Ensure tables exist on Supabase. Called dynamically at startup."""
     from database.models import Base
+    from sqlalchemy import text
+    import logging
+    
     engine = get_engine()
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        
+        # Safely attempt to add new columns (PostgreSQL / SQLite compatibility)
+        try:
+            await conn.execute(text("ALTER TABLE users ADD COLUMN partner_archetype VARCHAR(32);"))
+        except Exception as e:
+            pass # Column likely exists
+            
+        try:
+            await conn.execute(text("ALTER TABLE users RENAME COLUMN gender TO user_gender;"))
+            await conn.execute(text("ALTER TABLE users RENAME COLUMN bot_partner_gender TO partner_gender;"))
+        except Exception:
+            pass # Columns already renamed or SQLite syntax differs

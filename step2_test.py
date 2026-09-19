@@ -34,8 +34,8 @@ async def main() -> None:
     user = await crud.get_user(UID)
     assert user.native_language == user.ui_language == "fa"
     assert user.target_language == "en" and user.daily_goal == 50
-    assert user.gender == "male" and user.bot_partner_gender == "female"
-    print("[3] languages/goal/genders: instant UI-switch + opposite-gender partner OK")
+    assert user.user_gender == "male" and user.partner_gender == "female"
+    print("[3] languages/goal/genders: instant UI-switch + opposite-user_gender partner OK")
 
     # Vocabulary + Leitner
     words = [("hello", "سلام", 1), ("beautiful", "زیبا", 2), ("strawberry", "توت‌فرنگی", 3)]

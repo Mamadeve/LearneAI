@@ -344,7 +344,7 @@ async def get_leitner_stats(user_id: int, *, session: AsyncSession | None = None
         )
         return {box: count for box, count in result.all()}
 
-async def set_genders(user_id: int, gender: str, session: AsyncSession | None = None) -> User | None:
-    """Las o Lus rule: bot partner = opposite gender of the user."""
-    partner = "female" if gender == "male" else "male"
-    return await update_user(user_id, gender=gender, bot_partner_gender=partner)
+async def set_genders(user_id: int, user_gender: str, session: AsyncSession | None = None) -> User | None:
+    """Las o Lus rule: bot partner = opposite user_gender of the user."""
+    partner = "female" if user_gender == "male" else "male"
+    return await update_user(user_id, user_gender=user_gender, partner_gender=partner)

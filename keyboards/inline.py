@@ -74,3 +74,27 @@ def goals_kb(lang: str = "en", prefix: str = "onb:goal") -> InlineKeyboardMarkup
     ]
     rows.append([_glass(i18n.t(lang, "goals.custom"), f"{prefix}:custom")])
     return InlineKeyboardMarkup(inline_keyboard=rows)
+
+def gender_kb() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [
+            _glass("👦 پسر (Male)", "onb:gender:male"),
+            _glass("👧 دختر (Female)", "onb:gender:female")
+        ]
+    ])
+
+def partner_type_kb(user_gender: str) -> InlineKeyboardMarkup:
+    # Based on user_gender, we show orientation + archetype options
+    if user_gender == "male":
+        buttons = [
+            [_glass("👩 دختر (Straight)", "onb:partner:female:straight")],
+            [_glass("👨 پسر (Gay)", "onb:partner:male:gay")],
+            [_glass("🌸 فمبوی (Femboy - soft, cute boy)", "onb:partner:male:femboy")],
+        ]
+    else:
+        buttons = [
+            [_glass("👨 پسر (Straight)", "onb:partner:male:straight")],
+            [_glass("👩 دختر (Lesbian)", "onb:partner:female:lesbian")],
+            [_glass("🌸 فمبوی (Femboy - soft, cute boy)", "onb:partner:male:femboy")],
+        ]
+    return InlineKeyboardMarkup(inline_keyboard=buttons)

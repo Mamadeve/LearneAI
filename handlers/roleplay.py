@@ -232,7 +232,7 @@ async def _deliver(message: Message, user, lang: str, is_voice: bool, text: str)
     if is_voice and text:
         try:
             audio_bytes = await tts.synthesize_to_bytes(
-                text, user.target_language, user.bot_partner_gender or "female"
+                text, user.target_language, user.partner_gender or "female"
             )
             from aiogram.types import BufferedInputFile
 

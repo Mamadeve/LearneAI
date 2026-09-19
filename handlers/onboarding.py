@@ -41,6 +41,8 @@ MAX_GOAL = 100
 
 
 class Onb(StatesGroup):
+    user_gender = State()    # picking their own gender
+    partner_type = State()   # picking the partner archetype
     native_other = State()   # typing a custom native language name
     goal_custom = State()    # typing a custom daily goal
     quiz = State()           # answering quiz questions (data in FSM)
@@ -200,6 +202,53 @@ async def cb_level(cb: CallbackQuery, state: FSMContext) -> None:
     await state.update_data(claimed_level=claimed)
     if claimed == "barely":
         await cb.message.edit_text(i18n.t(lang, "start.tease"))
+    
+    # Transition to gender selection
+    from keyboards.inline import gender_kb
+    await state.set_state(Onb.user_gender)
+    
+    # We send a new message instead of edit to not wipe the tease
+    await cb.message.answer("لطفاً جنسیت خود را انتخاب کنید:", reply_markup=gender_kb())
+
+
+@router.callback_query(Onb.user_gender, F.data.startswith("onb:gender:"))
+async def cb_gender(cb: CallbackQuery, state: FSMContext) -> None:
+    user_gender = cb.data.split(":")[-1]
+    await cb.answer()
+    await state.update_data(user_gender=user_gender)
+    
+    from keyboards.inline import partner_type_kb
+    await state.set_state(Onb.partner_type)
+    await cb.message.edit_text(
+        "حالا شریک مکالمه (پارتنر هوش مصنوعی) خود را انتخاب کنید:", 
+        reply_markup=partner_type_kb(user_gender)
+    )
+
+
+@router.callback_query(Onb.partner_type, F.data.startswith("onb:partner:"))
+async def cb_partner_type(cb: CallbackQuery, state: FSMContext) -> None:
+    _, _, p_gender, p_archetype = cb.data.split(":")
+    await cb.answer()
+    
+    data = await state.get_data()
+    claimed = data.get("claimed_level", "beginner")
+    user_gender = data.get("user_gender", "other")
+    
+    user = await crud.get_user(cb.from_user.id)
+    lang = user.ui_language if i18n.supported(user.ui_language) else "en"
+    
+    # Save the explicitly chosen genders and archetype
+    await crud.update_user(
+        user.id,
+        user_gender=user_gender,
+        partner_gender=p_gender,
+        partner_archetype=p_archetype
+    )
+    # Re-fetch user to pass to launch_quiz
+    user = await crud.get_user(user.id)
+    
+    # Remove the keyboard and launch the quiz
+    await cb.message.edit_text("✅ پارتنر شما ذخیره شد.")
     await _launch_quiz(cb.message, state, user, lang, claimed)
 
 

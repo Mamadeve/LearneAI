@@ -29,7 +29,7 @@ from services.tts import pick_voice, synthesize_to_file  # noqa: E402
 def fake_user(**kw):
     defaults = dict(
         target_language="en", native_language="fa", level="beginner",
-        gender="male", bot_partner_gender="female",
+        user_gender="male", partner_gender="female",
     )
     defaults.update(kw)
     return SimpleNamespace(**defaults)
@@ -47,10 +47,10 @@ async def main() -> None:
     assert "[VOICE]" in p and "A2" in p and "Persian (Farsi)" in p
     print("[1] roleplay persona prompt: vocab injection, anti-assistant rules, voice tag, CEFR OK")
 
-    # [2] Persona changes with gender/level
-    p_m = build_roleplay_system_prompt(fake_user(gender="female", bot_partner_gender="male", level="advanced"), [])
+    # [2] Persona changes with user_gender/level
+    p_m = build_roleplay_system_prompt(fake_user(user_gender="female", partner_gender="male", level="advanced"), [])
     assert "playful guy" in p_m and "C1" in p_m and "Vocab mission" not in p_m
-    print("[2] persona adapts to partner gender / advanced level / empty due-words OK")
+    print("[2] persona adapts to partner user_gender / advanced level / empty due-words OK")
 
     # [3] Quiz + verdict prompts
     qp = build_quiz_generation_prompt("Spanish", "intermediate", 5)
