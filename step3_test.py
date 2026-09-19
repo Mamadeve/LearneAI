@@ -60,9 +60,9 @@ async def main() -> None:
     print("[3] quiz generation + verdict prompts OK")
 
     # [4] Live config resolution: .env defaults -> DB -> user overrides
-    await crud.set_api_config("llm_provider", "gemini")
+    await crud.set_api_config("llm_provider", "openrouter")
     cfg = await llm.get_live_config()
-    assert cfg["llm_provider"] == "gemini", cfg  # DB overrides .env
+    assert cfg["llm_provider"] == "openrouter", cfg  # DB overrides .env
     await crud.get_or_create_user(42, native_language="fa")
     await crud.update_user(42, api_overrides={"llm_provider": "groq"})
     cfg42 = await llm.get_live_config(42)
@@ -71,7 +71,7 @@ async def main() -> None:
 
     # [5] LLM failure path: dummy keys -> LLMError (no crash)
     await crud.set_api_config("groq_api_key", "gsk_INVALID")
-    await crud.set_api_config("gemini_api_key", "INVALID")
+    await crud.set_api_config("openrouter_api_key", "INVALID")
     try:
         await llm.chat([{"role": "user", "content": "hi"}], user_id=42)
         raise AssertionError("expected LLMError with dummy keys")

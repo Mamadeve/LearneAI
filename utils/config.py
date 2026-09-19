@@ -32,10 +32,9 @@ class Settings(BaseSettings):
     database_url: str = "sqlite+aiosqlite:///./learneai.db"
 
     # ---------- LLM ----------
-    llm_provider: str = "groq"  # "groq" | "gemini"
+    llm_provider: str = "groq"
     llm_model: str = "openai/gpt-oss-20b"
     groq_api_key: str = ""
-    gemini_api_key: str = ""
 
     # ---------- STT ----------
     stt_provider: str = "groq"  # "groq" | "hf"

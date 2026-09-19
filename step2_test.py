@@ -85,7 +85,7 @@ async def main() -> None:
     print(f"[9] streak: first={s1}, same-day={s2} OK")
 
     # API config cache
-    await crud.set_api_config("llm_provider", "gemini")
+    await crud.set_api_config("llm_provider", "openrouter")
     await crud.set_api_config("groq_api_key", "gsk_test")
     await crud.set_api_config("llm_provider", "groq")  # update path
     cfg = await crud.get_all_api_config()

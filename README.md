@@ -7,7 +7,7 @@ dynamic API management via an admin panel, and the core **"Las o Lus" Roleplay C
 ## Tech Stack
 - **aiogram 3.x** (strictly async, FSMContext)
 - **SQLAlchemy 2.x async** + SQLite (PostgreSQL-ready via `DATABASE_URL`)
-- **Groq (Llama-3/Mixtral)** or **Gemini** free tiers for LLM
+- **Groq (Llama-3/Mixtral)** free tiers for LLM
 - **Whisper** (Groq Audio / Hugging Face) for STT
 - **edge-tts** for TTS
 - **deep-translator / LibreTranslate** for translation
