@@ -53,12 +53,10 @@ async def get_live_config(user_id: int | None = None) -> dict[str, str]:
         user = await crud.get_user(user_id)
         if user:
             if user.selected_model_id:
-                provider_map = {
-                    "groq": ("groq", "openai/gpt-oss-20b"),
-                    "openrouter": ("openrouter", "openai/gpt-4o"),
-                }
-                if user.selected_model_id in provider_map:
-                    cfg["llm_provider"], cfg["llm_model"] = provider_map[user.selected_model_id]
+                # selected_model_id stores the exact Groq model name
+                # (e.g. "openai/gpt-oss-20b", "qwen/qwen3.8-27b")
+                cfg["llm_provider"] = "groq"
+                cfg["llm_model"] = user.selected_model_id
 
             if user.api_overrides:
                 cfg.update({k: str(v) for k, v in user.api_overrides.items() if k in CORE_KEYS})

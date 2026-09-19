@@ -291,7 +291,7 @@ async def _finish_quiz(
     try:
         verdict = await llm.chat(
             [{"role": "user", "content": build_quiz_verdict_prompt(lang_name(user.target_language), claimed, score, weak)}],
-            temperature=1.0, max_tokens=80,
+            user_id=user.id, temperature=1.0, max_tokens=80,
         )
         verdict = verdict.strip().strip('"')
     except Exception as exc:

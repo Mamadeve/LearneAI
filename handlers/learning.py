@@ -200,7 +200,7 @@ async def generate_words(user, n: int, known_texts: list[str]) -> list[tuple[str
         native=lang_name(user.native_language),
     )
     raw = await llm.chat([{"role": "user", "content": prompt}],
-                                 temperature=0.8, max_tokens=900)
+                                 user_id=user.id, temperature=0.8, max_tokens=900)
     return parse_llm_words(raw)
 
 
